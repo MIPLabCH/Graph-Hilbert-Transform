@@ -1,11 +1,19 @@
-## Directed GSP Framework
+## Graph Hilbert Transform
 
-The main goals of this repository is to investigate directed graph fourier transform. Generalizing operations such as filtering, sampling and time/phase-shifting. 
+The main goal of this repository is to define practical and interpretrable Graph Hilbert Transform
 
 #### Requirements
+```
+numpy
+matplotlib
+networkx
+```
 
 #### Structure
 
-- dGSPTransform
-- random_surrogate
-- graph_phase
+```
+├── README.md
+├── notebooks: notebooks for hands-on application of GHT 
+├── resources: external files needed for demo
+└── src: source code
+```
