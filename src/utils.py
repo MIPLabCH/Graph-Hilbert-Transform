@@ -155,7 +155,22 @@ def smooth1d(y: np.ndarray, box_pts: int):
     y_smooth = np.convolve(np.pad(y, (0,len(box)-1), 'edge'), box, mode="valid")
     return y_smooth
 
-def signaltonoise_dB(a):
+def signaltonoise_dB(a: np.ndarray):
+    """
+    Calculate the signal-to-noise ratio (SNR) in decibels (dB) for a given array.
+
+    Parameters
+    ----------
+    a (array-like): Input array containing the signal data.
+
+    Returns
+    -------
+    float: The signal-to-noise ratio in decibels (dB).
+
+    Notes:
+    The SNR is calculated as 20 times the base-10 logarithm of the absolute value of the mean of the array divided by the standard deviation of the array.
+    """
+
     a = np.asanyarray(a)
     m = a.mean()
     sd = a.std()

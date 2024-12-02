@@ -92,7 +92,6 @@ def get_polynomial_coefficients(A:np.ndarray, kernel:np.ndarray,
     else:
         Vnorm = V / 1.0
     vdm = vandermonde_matrix(Vnorm, minpolydeg)
-    # c = np.linalg.inv(vdm) @ kernel
     c = np.linalg.pinv(vdm) @ kernel
 
     return vdm, c

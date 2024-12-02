@@ -7,6 +7,8 @@ The main goal of this repository is to define practical and interpretrable Graph
 numpy
 matplotlib
 networkx
+shapely
+osmnx
 ```
 
 #### Structure
