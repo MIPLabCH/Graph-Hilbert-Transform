@@ -75,75 +75,6 @@ def plot_graph(G:nx.Graph, nd_values:np.ndarray, pos:Optional[dict]=None, cmap:O
         sm = plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(vmin=0, vmax=1))
         plt.colorbar(sm)
 
-def diagonalize(arr:np.ndarray, laplacian:bool=False):
-    """
-    Diagonalize the given adjacency matrix by calling an external
-    MATLAB script.
-
-    This function converts the adjacency matrix to a MATLAB compatible 
-    format, saves it to a temporary file, calls the MATLAB script to
-    diagonalize it, and returns the diagonalized matrix.
-
-    Parameters
-    ----------
-    arr : numpy.ndarray
-        The adjacency matrix to diagonalize.
-
-    laplacian : bool, optional
-        Whether the matrix should be converted to a Laplacian matrix
-        before diagonalizing. Default is False.
-
-    Returns
-    ------- 
-    numpy.ndarray
-        The diagonalized adjacency matrix.
-    """
-
-    def adjcencymat2matlab_digraph(A):
-        """
-        Compute adjacency format for matlab compatible from numpy array
-        """
-        weight = []
-        tmp = np.where(A != 0)
-        for k in range(len(tmp[0])):
-            x = tmp[0][k]
-            y = tmp[1][k]
-            weight.append(A[x, y])
-        ret = {"D1": tmp[0] + 1, "D2": tmp[1] + 1, "weight": np.array(weight)}
-        return ret
-
-    # Generate matlab format
-    sio.savemat("/tmp/tmp.mat", adjcencymat2matlab_digraph(arr))
-
-    if laplacian:
-        assert os.path.exists(
-            "../outsource/digraphSP-generalized-boundaries/diagonalize.m"
-        ), "matlab diagonalizing script not found"
-
-        os.system(
-            "/Applications/MATLAB_R2019b.app/bin/matlab -maci64 -nodisplay -nosplash -nodesktop -r \"run('../outsource/digraphSP-generalized-boundaries/diagonalize_laplacian.m');exit;\" | tail -n +11"
-        )
-
-        A = sio.loadmat("../outsource/digraphSP-generalized-boundaries/MNoJordan.mat")[
-            "MNoJordanBlocks"
-        ]
-        return A
-
-    else:
-        assert os.path.exists(
-            "../outsource/digraphSP-generalized-boundaries/diagonalize.m"
-        ), "matlab diagonalizing script not found"
-
-        # Call diagonalization of the script
-        os.system(
-            "/Applications/MATLAB_R2019b.app/bin/matlab -maci64 -nodisplay -nosplash -nodesktop -r \"run('../outsource/digraphSP-generalized-boundaries/diagonalize.m');exit;\" | tail -n +11"
-        )
-
-        A = sio.loadmat("../outsource/digraphSP-generalized-boundaries/MNoJordan.mat")[
-            "MNoJordanBlocks"
-        ]
-        return A
-
 def prep_transform(A:np.ndarray, gso:str="adj", composite:bool=True, verbose:bool=False, 
                    in_degree:bool=True):
     """
@@ -397,45 +328,6 @@ def make_graph(N:Union[int, tuple], graph_type:str, split:bool=False):
 
     return A
 
-def combine_graphs(A: np.ndarray, B: np.ndarray, nodes_listA: list, nodes_listB: list):
-    """
-    Combine graphs by union and adding edges between corresponding nodes.
-    Elements in nodes_listA and nodes_listB are indices of nodes to connect 
-    between graphs A and B respectively. Negative indexes refer to going from 
-    B to A while positive indexes refer to going from A to B.
-
-    Parameters
-    ----------
-    A : np.ndarray
-        Graph A adjacency matrix
-    B : np.ndarray
-        Graph B adjacency matrix
-    
-    nodes_listA : list
-        Nodes in A to connect
-    nodes_listB : list    
-        Nodes in B to connect
-
-    Returns
-    -------
-    ret : np.ndarray
-        Combined graph adjacency matrix
-    """
-
-    a = nx.convert_matrix.from_numpy_array(A, create_using=nx.DiGraph)
-    b = nx.convert_matrix.from_numpy_array(B, create_using=nx.DiGraph)
-
-    c = nx.union(a, b, rename=("a-", "b-"))
-    for k in range(len(nodes_listA)):
-        nA, nB = nodes_listA[k], nodes_listB[k]
-        if nA < 0 and nB < 0:
-            c.add_edge(f"b-{-nB}", f"a-{-nA}")
-        else:
-            c.add_edge(f"a-{nA}", f"b-{nB}")
-
-    ret = np.array(nx.adjacency_matrix(c).todense())
-    return ret
-
 def get_cycles(G: nx.Graph, start_idx: int, max_depth: int, verbose:bool=True):
     """
     Find all cycles reachable from a start node within a given maximum depth.
@@ -503,63 +395,6 @@ def get_cycles(G: nx.Graph, start_idx: int, max_depth: int, verbose:bool=True):
     unique_cycles = [p[:-1] for p in unique_cycles if p[0] == p[-1]]
         
     return unique_cycles
-
-def var_generator(A:np.ndarray, active_nodes:list, amplitude_nodes:list, 
-                  time_nodes:list, n_iter:int,
-                  add_noise:bool, time_noise:list, 
-                  gamma:float=1, seed:int=99):
-    """
-    Generates a sequence of directed graph signals over time using a graph spreading process.
-
-    Parameters
-    ----------
-        A (numpy.ndarray): The adjacency matrix of the graph.
-        active_nodes (list): A list of indices of the active nodes in the graph.
-        amplitude_nodes (list): A list of amplitudes to be applied to the active nodes.
-        time_nodes (list): A list of time steps at which the active node amplitudes should be applied.
-        n_iter (int): The number of time steps to simulate.
-        add_noise (bool): Whether to add Gaussian noise to the graph signals.
-        time_noise (list): A list of time steps at which Gaussian noise should be added.
-        gamma (float, optional): A scaling factor for the adjacency matrix. Defaults to 1.
-        seed (int, optional): A seed for the random number generator. Defaults to 99.
-
-    Returns
-    -------
-        directed_logs (numpy.ndarray): A 2D array of shape (n_iter, graphdim) containing the sequence of directed graph signals.
-    """
-    np.random.seed(seed)
-
-    graphdim = len(A)
-
-    # Initial condition: Implemented to be Gaussian Impulse
-    initial_cond = np.random.normal(0, 1, graphdim)
-    initial_directed = deepcopy(initial_cond)
-    directed_logs = [initial_directed]
-
-    # Defining GSO
-    muA = gamma * A
-
-    # Generating the diffusion processes
-    for _iter in range(n_iter - 1):
-
-        if (_iter in time_noise) and add_noise:
-            source_random = np.random.normal(0, 1, graphdim)
-        else:
-            source_random = np.zeros(graphdim)
-
-        # Spreading process
-        initial_directed = muA @ directed_logs[-1]
-
-        # Node Inherent process
-        initial_directed += source_random
-        if _iter in time_nodes:
-            for lidx, l in enumerate(active_nodes):
-                initial_directed[l] += amplitude_nodes[lidx]
-
-        directed_logs.append(initial_directed)
-
-    directed_logs = np.array(directed_logs)
-    return directed_logs
 
 def plot_spectrum_gft(signals:np.ndarray, U:np.ndarray, V:np.ndarray, Uinv:Optional[np.ndarray]=None, labels:Optional[list]=None,
                        spectreonly:bool=False, figsize:tuple=(9, 3), plot_real:bool=True):

@@ -1,6 +1,6 @@
 ## Graph Hilbert Transform
 
-The main goal of this repository is to define practical and interpretrable Graph Hilbert Transform
+The main goal of this repository is to define practical and interpretable Graph Hilbert Transform. Reproducing 10.1109/LSP.2025.3560170
 
 #### Requirements
 ```
