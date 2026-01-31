@@ -1,21 +1,21 @@
 ## Graph Hilbert Transform
 
-The main goal of this repository is to define practical and interpretable Graph Hilbert Transform. Reproducing 10.1109/LSP.2025.3560170
+This is the repository gathering the experiments for the paper ``Hilbert Transform on Graphs: Let There Be Phase" (10.1109/LSP.2025.3560170). All figures found can be re-generated from this repository.
+
+### Installation
+
+Run the command:
+`pip install -r requirements.txt`
+`pip install -i https://test.pypi.org/simple/ flowGSP`
 
 #### Requirements
-```
-numpy
-matplotlib
-networkx
-shapely
-osmnx
-```
 
-#### Structure
+Listed in `requirements.txt`.
 
-```
-├── README.md
-├── notebooks: notebooks for hands-on application of GHT 
-├── resources: external files needed for demo
-└── src: source code
-```
+#### Contents
+
+- Figures from paper ``Hilbert Transform on Graphs: Let There Be Phase"
+
+### Core Module
+
+This repository hosts the core FlowGSP implementation powering the Hilbert Transform on Graphs experiments and all reproducible figures from the paper.
