@@ -19,4 +19,4 @@ Listed in `requirements.txt`.
 ### Core Module
 
 
-This repository hosts the core (FlowGSP)[https://github.com/miki998/FlowGSP/] implementation powering the Hilbert Transform on Graphs experiments and all reproducible figures from the paper.
+This repository hosts the core [FlowGSP](https://github.com/miki998/FlowGSP/) implementation powering the Hilbert Transform on Graphs experiments and all reproducible figures from the paper.
