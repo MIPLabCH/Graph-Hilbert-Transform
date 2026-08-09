@@ -5,12 +5,18 @@ This is the repository gathering the experiments for the paper ``Hilbert Transfo
 ### Installation
 
 Run the command:
-`pip install -r requirements.txt`
-`pip install -i https://test.pypi.org/simple/ flowGSP`
+`pip install GyRAPH`
 
-#### Requirements
+### Run Experiments
+```
+# List all available experiments
+python -m experiments.run --list
 
-Listed in `requirements.txt`.
+# Run a specific experiment
+python -m experiments.run --paper paper_graph_hilbert_transform --experiment exp_flower-graph
+```
+
+In each experiment folders are located config files you can change to modify the input parameters to experiments.
 
 #### Contents
 
@@ -18,5 +24,4 @@ Listed in `requirements.txt`.
 
 ### Core Module
 
-
-This repository hosts the core [FlowGSP](https://github.com/miki998/FlowGSP/) implementation powering the Hilbert Transform on Graphs experiments and all reproducible figures from the paper.
+This repository hosts the core [GyRAPH](https://github.com/miki998/GyRAPH/) implementation powering the Hilbert Transform on Graphs experiments and all reproducible figures from the paper.
